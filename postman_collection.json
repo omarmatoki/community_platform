@@ -1,0 +1,1230 @@
+{
+  "info": {
+    "name": "منصة تعزيز الوعي المجتمعي - Community Platform API",
+    "description": "مجموعة كاملة من API endpoints لمنصة تعزيز الوعي المجتمعي",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "categoryId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "articleId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "surveyId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "gameId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "pollId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "sessionId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth - المصادقة",
+      "item": [
+        {
+          "name": "تسجيل مستخدم جديد - Register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('token', jsonData.token);",
+                  "    pm.collectionVariables.set('userId', jsonData.user.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"أحمد محمد\",\n  \"email\": \"ahmed@example.com\",\n  \"password\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "تسجيل مستخدم جديد في المنصة"
+          }
+        },
+        {
+          "name": "تسجيل الدخول - Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('token', jsonData.token);",
+                  "    pm.collectionVariables.set('userId', jsonData.user.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"ahmed@example.com\",\n  \"password\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "تسجيل الدخول والحصول على JWT Token"
+          }
+        },
+        {
+          "name": "عرض الملف الشخصي - Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "profile"]
+            },
+            "description": "عرض معلومات الملف الشخصي للمستخدم المسجل"
+          }
+        },
+        {
+          "name": "تحديث الملف الشخصي - Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"أحمد محمد المحدث\",\n  \"email\": \"ahmed.updated@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "profile"]
+            },
+            "description": "تحديث معلومات الملف الشخصي"
+          }
+        },
+        {
+          "name": "تغيير كلمة المرور - Change Password",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"123456\",\n  \"newPassword\": \"newPassword123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/change-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "change-password"]
+            },
+            "description": "تغيير كلمة المرور"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users - المستخدمون",
+      "item": [
+        {
+          "name": "لوحة الصدارة - Leaderboard (Public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/leaderboard",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "leaderboard"]
+            },
+            "description": "عرض لوحة الصدارة للمستخدمين حسب النقاط"
+          }
+        },
+        {
+          "name": "جميع المستخدمين - Get All Users (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users"]
+            },
+            "description": "عرض جميع المستخدمين - يتطلب صلاحية Admin"
+          }
+        },
+        {
+          "name": "مستخدم معين - Get User By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "{{userId}}"]
+            },
+            "description": "عرض معلومات مستخدم معين"
+          }
+        },
+        {
+          "name": "تحديث مستخدم - Update User (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"اسم جديد\",\n  \"email\": \"newemail@example.com\",\n  \"role\": \"admin\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "{{userId}}"]
+            },
+            "description": "تحديث معلومات مستخدم - يتطلب صلاحية Admin"
+          }
+        },
+        {
+          "name": "حذف مستخدم - Delete User (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "{{userId}}"]
+            },
+            "description": "حذف مستخدم - يتطلب صلاحية Admin"
+          }
+        },
+        {
+          "name": "نقاط المستخدم - Get User Points",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/{{userId}}/points",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "{{userId}}", "points"]
+            },
+            "description": "عرض نقاط مستخدم معين"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Categories - التصنيفات",
+      "item": [
+        {
+          "name": "جميع التصنيفات - Get All Categories",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const jsonData = pm.response.json();",
+                  "    if (jsonData.categories && jsonData.categories.length > 0) {",
+                  "        pm.collectionVariables.set('categoryId', jsonData.categories[0].id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "categories"]
+            },
+            "description": "عرض جميع التصنيفات"
+          }
+        },
+        {
+          "name": "تصنيف معين - Get Category By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/categories/{{categoryId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "categories", "{{categoryId}}"]
+            },
+            "description": "عرض تصنيف معين بالتفصيل"
+          }
+        },
+        {
+          "name": "إنشاء تصنيف - Create Category (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('categoryId', jsonData.category.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"الصحة العامة\",\n  \"description\": \"مقالات عن الصحة والوقاية\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "categories"]
+            },
+            "description": "إنشاء تصنيف جديد - يتطلب صلاحية Admin"
+          }
+        },
+        {
+          "name": "تحديث تصنيف - Update Category (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"الصحة العامة المحدثة\",\n  \"description\": \"وصف محدث للتصنيف\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/categories/{{categoryId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "categories", "{{categoryId}}"]
+            },
+            "description": "تحديث تصنيف - يتطلب صلاحية Admin"
+          }
+        },
+        {
+          "name": "حذف تصنيف - Delete Category (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/categories/{{categoryId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "categories", "{{categoryId}}"]
+            },
+            "description": "حذف تصنيف - يتطلب صلاحية Admin"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Articles - المقالات",
+      "item": [
+        {
+          "name": "جميع المقالات - Get All Articles",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const jsonData = pm.response.json();",
+                  "    if (jsonData.articles && jsonData.articles.length > 0) {",
+                  "        pm.collectionVariables.set('articleId', jsonData.articles[0].id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/articles",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "articles"]
+            },
+            "description": "عرض جميع المقالات"
+          }
+        },
+        {
+          "name": "مقال معين - Get Article By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/articles/{{articleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "articles", "{{articleId}}"]
+            },
+            "description": "عرض مقال معين بالتفصيل"
+          }
+        },
+        {
+          "name": "مقالات حسب التصنيف - Get Articles By Category",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/articles/category/{{categoryId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "articles", "category", "{{categoryId}}"]
+            },
+            "description": "عرض جميع المقالات في تصنيف معين"
+          }
+        },
+        {
+          "name": "إنشاء مقال - Create Article (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('articleId', jsonData.article.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"أهمية الوعي المجتمعي\",\n  \"content\": \"محتوى المقال هنا. يتحدث عن أهمية الوعي المجتمعي في بناء مجتمع قوي ومتماسك...\",\n  \"categoryId\": \"{{categoryId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/articles",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "articles"]
+            },
+            "description": "إنشاء مقال جديد - يتطلب صلاحية Admin"
+          }
+        },
+        {
+          "name": "تحديث مقال - Update Article (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"أهمية الوعي المجتمعي - محدث\",\n  \"content\": \"محتوى محدث للمقال...\",\n  \"categoryId\": \"{{categoryId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/articles/{{articleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "articles", "{{articleId}}"]
+            },
+            "description": "تحديث مقال - يتطلب صلاحية Admin"
+          }
+        },
+        {
+          "name": "حذف مقال - Delete Article (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/articles/{{articleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "articles", "{{articleId}}"]
+            },
+            "description": "حذف مقال - يتطلب صلاحية Admin"
+          }
+        },
+        {
+          "name": "تسجيل قراءة مقال - Mark Article As Read (+5 نقاط)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/articles/{{articleId}}/read",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "articles", "{{articleId}}", "read"]
+            },
+            "description": "تسجيل قراءة المقال والحصول على 5 نقاط (مرة واحدة فقط)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Surveys - الاستبيانات",
+      "item": [
+        {
+          "name": "استبيان حسب المقال - Get Survey By Article ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const jsonData = pm.response.json();",
+                  "    if (jsonData.survey) {",
+                  "        pm.collectionVariables.set('surveyId', jsonData.survey.id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/surveys/article/{{articleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "surveys", "article", "{{articleId}}"]
+            },
+            "description": "عرض الاستبيان المرتبط بمقال معين"
+          }
+        },
+        {
+          "name": "إنشاء استبيان - Create Survey (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('surveyId', jsonData.survey.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"articleId\": \"{{articleId}}\",\n  \"title\": \"اختبار الوعي المجتمعي\",\n  \"questions\": [\n    {\n      \"questionText\": \"ما هو الوعي المجتمعي؟\",\n      \"options\": [\n        {\n          \"optionText\": \"فهم القضايا المجتمعية والمساهمة في حلها\",\n          \"isCorrect\": true\n        },\n        {\n          \"optionText\": \"عدم الاهتمام بالمجتمع\",\n          \"isCorrect\": false\n        },\n        {\n          \"optionText\": \"الاهتمام بالأمور الشخصية فقط\",\n          \"isCorrect\": false\n        }\n      ]\n    },\n    {\n      \"questionText\": \"ما هي فوائد الوعي المجتمعي؟\",\n      \"options\": [\n        {\n          \"optionText\": \"بناء مجتمع قوي ومتماسك\",\n          \"isCorrect\": true\n        },\n        {\n          \"optionText\": \"زيادة المشاكل المجتمعية\",\n          \"isCorrect\": false\n        }\n      ]\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/surveys",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "surveys"]
+            },
+            "description": "إنشاء استبيان جديد لمقال - يتطلب صلاحية Admin"
+          }
+        },
+        {
+          "name": "إرسال إجابات الاستبيان - Submit Survey (+10 نقاط عند 70%+)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"answers\": [\n    {\n      \"questionId\": \"question-uuid-1\",\n      \"optionId\": \"option-uuid-1\"\n    },\n    {\n      \"questionId\": \"question-uuid-2\",\n      \"optionId\": \"option-uuid-2\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/surveys/{{surveyId}}/submit",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "surveys", "{{surveyId}}", "submit"]
+            },
+            "description": "إرسال إجابات الاستبيان - يمنح 10 نقاط عند الحصول على 70% أو أكثر"
+          }
+        },
+        {
+          "name": "نتائج المستخدم في الاستبيان - Get User Survey Results",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/surveys/{{surveyId}}/results",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "surveys", "{{surveyId}}", "results"]
+            },
+            "description": "عرض نتائج المستخدم في استبيان معين"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Games - الألعاب",
+      "item": [
+        {
+          "name": "جميع الألعاب - Get All Games",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const jsonData = pm.response.json();",
+                  "    if (jsonData.games && jsonData.games.length > 0) {",
+                  "        pm.collectionVariables.set('gameId', jsonData.games[0].id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/games",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "games"]
+            },
+            "description": "عرض جميع الألعاب المتاحة"
+          }
+        },
+        {
+          "name": "لعبة معينة - Get Game By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/games/{{gameId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "games", "{{gameId}}"]
+            },
+            "description": "عرض تفاصيل لعبة معينة"
+          }
+        },
+        {
+          "name": "سجل ألعاب المستخدم - Get User Game History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/games/user/history",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "games", "user", "history"]
+            },
+            "description": "عرض سجل الألعاب التي أكملها المستخدم"
+          }
+        },
+        {
+          "name": "إنشاء لعبة - Create Game (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('gameId', jsonData.game.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"كلمات متقاطعة - الوعي المجتمعي\",\n  \"description\": \"لعبة كلمات متقاطعة عن الوعي المجتمعي\",\n  \"type\": \"crossword\",\n  \"difficulty\": \"medium\",\n  \"gameData\": {\n    \"clues\": [\n      {\n        \"number\": 1,\n        \"direction\": \"across\",\n        \"clue\": \"المساهمة في حل القضايا\",\n        \"answer\": \"مشاركة\"\n      },\n      {\n        \"number\": 2,\n        \"direction\": \"down\",\n        \"clue\": \"فهم احتياجات الآخرين\",\n        \"answer\": \"تعاطف\"\n      }\n    ]\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/games",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "games"]
+            },
+            "description": "إنشاء لعبة جديدة - يتطلب صلاحية Admin"
+          }
+        },
+        {
+          "name": "تحديث لعبة - Update Game (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"كلمات متقاطعة محدثة\",\n  \"description\": \"وصف محدث للعبة\",\n  \"difficulty\": \"hard\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/games/{{gameId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "games", "{{gameId}}"]
+            },
+            "description": "تحديث لعبة - يتطلب صلاحية Admin"
+          }
+        },
+        {
+          "name": "حذف لعبة - Delete Game (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/games/{{gameId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "games", "{{gameId}}"]
+            },
+            "description": "حذف لعبة - يتطلب صلاحية Admin"
+          }
+        },
+        {
+          "name": "إكمال لعبة - Complete Game (+15 نقطة)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"score\": 85,\n  \"completionTime\": 300\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/games/{{gameId}}/complete",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "games", "{{gameId}}", "complete"]
+            },
+            "description": "تسجيل إكمال لعبة والحصول على 15 نقطة (مرة واحدة فقط لكل لعبة)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Polls - استطلاعات الرأي",
+      "item": [
+        {
+          "name": "جميع استطلاعات الرأي - Get All Polls",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const jsonData = pm.response.json();",
+                  "    if (jsonData.polls && jsonData.polls.length > 0) {",
+                  "        pm.collectionVariables.set('pollId', jsonData.polls[0].id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/polls",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "polls"]
+            },
+            "description": "عرض جميع استطلاعات الرأي"
+          }
+        },
+        {
+          "name": "استطلاع معين - Get Poll By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/polls/{{pollId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "polls", "{{pollId}}"]
+            },
+            "description": "عرض تفاصيل استطلاع رأي معين"
+          }
+        },
+        {
+          "name": "نتائج استطلاع - Get Poll Results",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/polls/{{pollId}}/results",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "polls", "{{pollId}}", "results"]
+            },
+            "description": "عرض نتائج استطلاع الرأي"
+          }
+        },
+        {
+          "name": "إنشاء استطلاع - Create Poll (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('pollId', jsonData.poll.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"ما رأيك في أهمية الوعي المجتمعي؟\",\n  \"options\": [\n    \"مهم جداً\",\n    \"مهم\",\n    \"متوسط الأهمية\",\n    \"غير مهم\"\n  ],\n  \"endDate\": \"2025-12-31\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/polls",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "polls"]
+            },
+            "description": "إنشاء استطلاع رأي جديد - يتطلب صلاحية Admin"
+          }
+        },
+        {
+          "name": "تحديث استطلاع - Update Poll (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"سؤال محدث\",\n  \"endDate\": \"2026-01-31\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/polls/{{pollId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "polls", "{{pollId}}"]
+            },
+            "description": "تحديث استطلاع رأي - يتطلب صلاحية Admin"
+          }
+        },
+        {
+          "name": "حذف استطلاع - Delete Poll (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/polls/{{pollId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "polls", "{{pollId}}"]
+            },
+            "description": "حذف استطلاع رأي - يتطلب صلاحية Admin"
+          }
+        },
+        {
+          "name": "التصويت - Vote Poll (+5 نقاط)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"option\": \"مهم جداً\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/polls/{{pollId}}/vote",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "polls", "{{pollId}}", "vote"]
+            },
+            "description": "التصويت في استطلاع رأي والحصول على 5 نقاط (مرة واحدة فقط)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Discussion Sessions - الجلسات الحوارية",
+      "item": [
+        {
+          "name": "جميع الجلسات - Get All Sessions",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const jsonData = pm.response.json();",
+                  "    if (jsonData.sessions && jsonData.sessions.length > 0) {",
+                  "        pm.collectionVariables.set('sessionId', jsonData.sessions[0].id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/discussions",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "discussions"]
+            },
+            "description": "عرض جميع الجلسات الحوارية"
+          }
+        },
+        {
+          "name": "جلسة معينة - Get Session By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/discussions/{{sessionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "discussions", "{{sessionId}}"]
+            },
+            "description": "عرض تفاصيل جلسة حوارية معينة"
+          }
+        },
+        {
+          "name": "إنشاء جلسة - Create Session (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('sessionId', jsonData.session.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"جلسة حوارية حول الوعي المجتمعي\",\n  \"description\": \"مناقشة أهمية الوعي المجتمعي ودوره في التنمية\",\n  \"meetLink\": \"https://meet.google.com/abc-defg-hij\",\n  \"scheduledDate\": \"2025-12-01T15:00:00Z\",\n  \"duration\": 120\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/discussions",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "discussions"]
+            },
+            "description": "إنشاء جلسة حوارية جديدة - يتطلب صلاحية Admin"
+          }
+        },
+        {
+          "name": "تحديث جلسة - Update Session (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"جلسة محدثة\",\n  \"description\": \"وصف محدث\",\n  \"scheduledDate\": \"2025-12-15T15:00:00Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/discussions/{{sessionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "discussions", "{{sessionId}}"]
+            },
+            "description": "تحديث جلسة حوارية - يتطلب صلاحية Admin"
+          }
+        },
+        {
+          "name": "حذف جلسة - Delete Session (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/discussions/{{sessionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "discussions", "{{sessionId}}"]
+            },
+            "description": "حذف جلسة حوارية - يتطلب صلاحية Admin"
+          }
+        },
+        {
+          "name": "تسجيل حضور - Mark Attendance (+20 نقطة)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/discussions/{{sessionId}}/attend",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "discussions", "{{sessionId}}", "attend"]
+            },
+            "description": "تسجيل حضور جلسة حوارية والحصول على 20 نقطة (مرة واحدة فقط)"
+          }
+        },
+        {
+          "name": "قائمة الحضور - Get Attendees (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/discussions/{{sessionId}}/attendees",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "discussions", "{{sessionId}}", "attendees"]
+            },
+            "description": "عرض قائمة الحضور لجلسة - يتطلب صلاحية Admin"
+          }
+        }
+      ]
+    }
+  ]
+}
