@@ -1,0 +1,526 @@
+{
+  "info": {
+    "name": "منصة تعزيز الوعي المجتمعي - Community Platform API المحدث",
+    "description": "مجموعة كاملة ومحدثة من API endpoints مع الميزات الجديدة: استطلاعات الجلسات والألعاب المحسّنة",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "community-platform-v2"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "categoryId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "articleId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "surveyId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "gameId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "pollId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "sessionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "sessionPollId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "optionId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth - المصادقة",
+      "item": [
+        {
+          "name": "تسجيل مستخدم جديد - Register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('token', jsonData.token);",
+                  "    pm.collectionVariables.set('userId', jsonData.user.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"أحمد محمد\",\n  \"email\": \"ahmed@example.com\",\n  \"password\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "تسجيل الدخول - Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('token', jsonData.token);",
+                  "    pm.collectionVariables.set('userId', jsonData.user.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"ahmed@example.com\",\n  \"password\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Games - الألعاب المحدثة",
+      "item": [
+        {
+          "name": "إنشاء لعبة كلمات متقاطعة - Create Crossword (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('gameId', jsonData.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"crossword\",\n  \"title\": \"كلمات متقاطعة - الوعي المجتمعي\",\n  \"content\": {\n    \"words\": [\n      {\n        \"number\": 1,\n        \"direction\": \"across\",\n        \"question\": \"ما هو المصطلح الذي يعني المساهمة الفعالة في حل القضايا المجتمعية؟\",\n        \"answer\": \"مشاركة\",\n        \"position\": {\n          \"row\": 0,\n          \"col\": 0\n        }\n      },\n      {\n        \"number\": 2,\n        \"direction\": \"down\",\n        \"question\": \"ما هي الصفة التي تعبر عن فهم احتياجات ومشاعر الآخرين؟\",\n        \"answer\": \"تعاطف\",\n        \"position\": {\n          \"row\": 0,\n          \"col\": 3\n        }\n      },\n      {\n        \"number\": 3,\n        \"direction\": \"across\",\n        \"question\": \"ما هو العمل الذي يُقدم دون مقابل مادي لخدمة المجتمع؟\",\n        \"answer\": \"تطوع\",\n        \"position\": {\n          \"row\": 2,\n          \"col\": 1\n        }\n      }\n    ]\n  },\n  \"educationalMessage\": \"أحسنت! الوعي المجتمعي يبدأ بالمشاركة والتعاطف والتطوع\",\n  \"pointsReward\": 15\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/games",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "games"]
+            }
+          }
+        },
+        {
+          "name": "جميع الألعاب - Get All Games",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const jsonData = pm.response.json();",
+                  "    if (jsonData.data && jsonData.data.length > 0) {",
+                  "        pm.collectionVariables.set('gameId', jsonData.data[0].id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/games",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "games"]
+            }
+          }
+        },
+        {
+          "name": "لعبة معينة - Get Game By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/games/{{gameId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "games", "{{gameId}}"]
+            }
+          }
+        },
+        {
+          "name": "إكمال لعبة - Complete Game (+15 نقطة)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/games/{{gameId}}/complete",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "games", "{{gameId}}", "complete"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Discussion Sessions - الجلسات الحوارية المحدثة",
+      "item": [
+        {
+          "name": "إنشاء جلسة حوارية - Create Session (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('sessionId', jsonData.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"جلسة حوارية حول الوعي المجتمعي\",\n  \"description\": \"مناقشة أهمية الوعي المجتمعي ودوره في التنمية\",\n  \"dateTime\": \"2025-12-15T15:00:00Z\",\n  \"pointsReward\": 20\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/discussions",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "discussions"]
+            }
+          }
+        },
+        {
+          "name": "جميع الجلسات - Get All Sessions",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const jsonData = pm.response.json();",
+                  "    if (jsonData.data && jsonData.data.length > 0) {",
+                  "        pm.collectionVariables.set('sessionId', jsonData.data[0].id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/discussions",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "discussions"]
+            }
+          }
+        },
+        {
+          "name": "جلسة معينة - Get Session By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/discussions/{{sessionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "discussions", "{{sessionId}}"]
+            }
+          }
+        },
+        {
+          "name": "🆕 إنشاء استطلاع للجلسة - Create Poll (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('sessionPollId', jsonData.data.poll.id);",
+                  "    if (jsonData.data.options && jsonData.data.options.length > 0) {",
+                  "        pm.collectionVariables.set('optionId', jsonData.data.options[0].id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"ما رأيك في موضوع الجلسة الحوارية؟\",\n  \"options\": [\n    \"ممتاز ومفيد جداً\",\n    \"جيد\",\n    \"متوسط\",\n    \"يحتاج لتحسين\"\n  ],\n  \"endDate\": \"2025-12-14T23:59:59Z\",\n  \"pointsReward\": 5\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/discussions/{{sessionId}}/poll",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "discussions", "{{sessionId}}", "poll"]
+            }
+          }
+        },
+        {
+          "name": "🆕 عرض استطلاع الجلسة - Get Session Poll",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/discussions/{{sessionId}}/poll",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "discussions", "{{sessionId}}", "poll"]
+            }
+          }
+        },
+        {
+          "name": "🆕 التصويت في استطلاع الجلسة - Vote (+5 نقاط)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"optionId\": \"{{optionId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/discussions/{{sessionId}}/poll/vote",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "discussions", "{{sessionId}}", "poll", "vote"]
+            }
+          }
+        },
+        {
+          "name": "🆕 نتائج استطلاع الجلسة - Get Poll Results",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/discussions/{{sessionId}}/poll/results",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "discussions", "{{sessionId}}", "poll", "results"]
+            }
+          }
+        },
+        {
+          "name": "🆕 إضافة رابط Google Meet - Add Meet Link (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"meetLink\": \"https://meet.google.com/abc-defg-hij\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/discussions/{{sessionId}}/meet-link",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "discussions", "{{sessionId}}", "meet-link"]
+            }
+          }
+        },
+        {
+          "name": "🆕 جلب رابط Google Meet - Get Meet Link",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/discussions/{{sessionId}}/meet-link",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "discussions", "{{sessionId}}", "meet-link"]
+            }
+          }
+        },
+        {
+          "name": "تسجيل حضور - Mark Attendance (+20 نقطة)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/discussions/{{sessionId}}/attend",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "discussions", "{{sessionId}}", "attend"]
+            }
+          }
+        },
+        {
+          "name": "قائمة الحضور - Get Attendees (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/discussions/{{sessionId}}/attendees",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "discussions", "{{sessionId}}", "attendees"]
+            }
+          }
+        },
+        {
+          "name": "تحديث جلسة - Update Session (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"جلسة محدثة\",\n  \"description\": \"وصف محدث\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/discussions/{{sessionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "discussions", "{{sessionId}}"]
+            }
+          }
+        },
+        {
+          "name": "حذف جلسة - Delete Session (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/discussions/{{sessionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "discussions", "{{sessionId}}"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -31,7 +31,7 @@ module.exports = (sequelize) => {
     content: {
       type: DataTypes.JSON,
       allowNull: false,
-      comment: 'محتوى اللعبة بصيغة JSON'
+      comment: 'محتوى اللعبة بصيغة JSON - للكلمات المتقاطعة: {words: [{number, direction, question, answer, position: {row, col}}]}'
     },
     educationalMessage: {
       type: DataTypes.TEXT,

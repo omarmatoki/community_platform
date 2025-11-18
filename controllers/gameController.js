@@ -16,6 +16,40 @@ const createGame = async (req, res, next) => {
       });
     }
 
+    // التحقق من صحة بنية الكلمات المتقاطعة
+    if (type === 'crossword') {
+      if (!content.words || !Array.isArray(content.words) || content.words.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'يجب أن يحتوي محتوى الكلمات المتقاطعة على مصفوفة words'
+        });
+      }
+
+      // التحقق من كل كلمة
+      for (const word of content.words) {
+        if (!word.number || !word.direction || !word.question || !word.answer || !word.position) {
+          return res.status(400).json({
+            success: false,
+            message: 'كل كلمة يجب أن تحتوي على: number, direction, question, answer, position'
+          });
+        }
+
+        if (!['across', 'down'].includes(word.direction)) {
+          return res.status(400).json({
+            success: false,
+            message: 'اتجاه الكلمة يجب أن يكون across أو down'
+          });
+        }
+
+        if (!word.position.row || word.position.row < 0 || !word.position.col || word.position.col < 0) {
+          return res.status(400).json({
+            success: false,
+            message: 'موقع الكلمة يجب أن يحتوي على row و col صحيحين'
+          });
+        }
+      }
+    }
+
     const game = await Game.create({
       type,
       title,

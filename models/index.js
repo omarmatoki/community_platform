@@ -16,6 +16,9 @@ const Poll = require('./Poll')(sequelize);
 const PollVote = require('./PollVote')(sequelize);
 const DiscussionSession = require('./DiscussionSession')(sequelize);
 const SessionAttendance = require('./SessionAttendance')(sequelize);
+const SessionPoll = require('./SessionPoll')(sequelize);
+const SessionPollOption = require('./SessionPollOption')(sequelize);
+const SessionPollVote = require('./SessionPollVote')(sequelize);
 
 // ==================== علاقات المستخدمين ====================
 
@@ -215,6 +218,56 @@ SessionAttendance.belongsTo(DiscussionSession, {
   as: 'session'
 });
 
+// الجلسة يمكن أن يكون لها استطلاع واحد
+DiscussionSession.hasOne(SessionPoll, {
+  foreignKey: 'sessionId',
+  as: 'poll'
+});
+SessionPoll.belongsTo(DiscussionSession, {
+  foreignKey: 'sessionId',
+  as: 'session'
+});
+
+// استطلاع الجلسة يحتوي على عدة خيارات
+SessionPoll.hasMany(SessionPollOption, {
+  foreignKey: 'pollId',
+  as: 'options'
+});
+SessionPollOption.belongsTo(SessionPoll, {
+  foreignKey: 'pollId',
+  as: 'poll'
+});
+
+// استطلاع الجلسة يمكن أن يحتوي على عدة أصوات
+SessionPoll.hasMany(SessionPollVote, {
+  foreignKey: 'pollId',
+  as: 'votes'
+});
+SessionPollVote.belongsTo(SessionPoll, {
+  foreignKey: 'pollId',
+  as: 'poll'
+});
+
+// خيار الاستطلاع يمكن أن يحتوي على عدة أصوات
+SessionPollOption.hasMany(SessionPollVote, {
+  foreignKey: 'optionId',
+  as: 'votes'
+});
+SessionPollVote.belongsTo(SessionPollOption, {
+  foreignKey: 'optionId',
+  as: 'option'
+});
+
+// المستخدم يمكنه التصويت في عدة استطلاعات جلسات
+User.hasMany(SessionPollVote, {
+  foreignKey: 'userId',
+  as: 'sessionPollVotes'
+});
+SessionPollVote.belongsTo(User, {
+  foreignKey: 'userId',
+  as: 'user'
+});
+
 // تصدير جميع النماذج
 module.exports = {
   sequelize,
@@ -231,5 +284,8 @@ module.exports = {
   Poll,
   PollVote,
   DiscussionSession,
-  SessionAttendance
+  SessionAttendance,
+  SessionPoll,
+  SessionPollOption,
+  SessionPollVote
 };
