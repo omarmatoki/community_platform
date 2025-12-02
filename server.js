@@ -77,7 +77,7 @@ const startServer = async () => {
 
     // مزامنة قاعدة البيانات (إنشاء الجداول)
     // في الإنتاج، استخدم { alter: true } أو migrations
-    await sequelize.sync({ force: false });
+await sequelize.sync({ force: false, alter: false });
     console.log('✓ تمت مزامنة قاعدة البيانات بنجاح');
 
     // بدء السيرفر

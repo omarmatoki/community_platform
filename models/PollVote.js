@@ -27,12 +27,17 @@ module.exports = (sequelize) => {
       },
       onDelete: 'CASCADE'
     },
-    vote: {
-      type: DataTypes.STRING,
+    optionId: {
+      type: DataTypes.UUID,
       allowNull: false,
+      references: {
+        model: 'poll_options',
+        key: 'id'
+      },
+      onDelete: 'CASCADE',
       validate: {
         notEmpty: {
-          msg: 'الصوت مطلوب'
+          msg: 'الخيار المحدد مطلوب'
         }
       }
     },

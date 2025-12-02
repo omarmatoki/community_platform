@@ -13,6 +13,7 @@ const UserAnswer = require('./UserAnswer')(sequelize);
 const Game = require('./Game')(sequelize);
 const UserGame = require('./UserGame')(sequelize);
 const Poll = require('./Poll')(sequelize);
+const PollOption = require('./PollOption')(sequelize);
 const PollVote = require('./PollVote')(sequelize);
 const DiscussionSession = require('./DiscussionSession')(sequelize);
 const SessionAttendance = require('./SessionAttendance')(sequelize);
@@ -196,6 +197,16 @@ UserGame.belongsTo(Game, {
 
 // ==================== علاقات الاستطلاعات ====================
 
+// الاستطلاع يمكن أن يحتوي على عدة خيارات
+Poll.hasMany(PollOption, {
+  foreignKey: 'pollId',
+  as: 'options'
+});
+PollOption.belongsTo(Poll, {
+  foreignKey: 'pollId',
+  as: 'poll'
+});
+
 // الاستطلاع يمكن أن يحتوي على عدة أصوات
 Poll.hasMany(PollVote, {
   foreignKey: 'pollId',
@@ -204,6 +215,16 @@ Poll.hasMany(PollVote, {
 PollVote.belongsTo(Poll, {
   foreignKey: 'pollId',
   as: 'poll'
+});
+
+// الخيار يمكن أن يحصل على عدة أصوات
+PollOption.hasMany(PollVote, {
+  foreignKey: 'optionId',
+  as: 'votes'
+});
+PollVote.belongsTo(PollOption, {
+  foreignKey: 'optionId',
+  as: 'option'
 });
 
 // ==================== علاقات الجلسات الحوارية ====================
@@ -282,6 +303,7 @@ module.exports = {
   Game,
   UserGame,
   Poll,
+  PollOption,
   PollVote,
   DiscussionSession,
   SessionAttendance,

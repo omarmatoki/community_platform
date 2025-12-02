@@ -1,5 +1,5 @@
 // Controller لإدارة استطلاعات الرأي
-const { Poll, PollVote, User } = require('../models');
+const { Poll, PollOption, PollVote, User } = require('../models');
 const { addPoints, calculatePollPoints } = require('../utils/pointsSystem');
 
 // @desc    إنشاء استطلاع رأي جديد
@@ -7,7 +7,7 @@ const { addPoints, calculatePollPoints } = require('../utils/pointsSystem');
 // @access  Private/Admin
 const createPoll = async (req, res, next) => {
   try {
-    const { title, description, pointsReward } = req.body;
+    const { title, description, pointsReward, options } = req.body;
 
     if (!title) {
       return res.status(400).json({
@@ -16,6 +16,14 @@ const createPoll = async (req, res, next) => {
       });
     }
 
+    if (!options || !Array.isArray(options) || options.length < 2) {
+      return res.status(400).json({
+        success: false,
+        message: 'يجب إضافة خيارين على الأقل للاستطلاع'
+      });
+    }
+
+    // إنشاء الاستطلاع
     const poll = await Poll.create({
       title,
       description,
@@ -23,10 +31,32 @@ const createPoll = async (req, res, next) => {
       pointsReward: pointsReward || 5
     });
 
+    // إنشاء الخيارات
+    await Promise.all(
+      options.map((optionText, index) =>
+        PollOption.create({
+          pollId: poll.id,
+          text: optionText,
+          order: index
+        })
+      )
+    );
+
+    // إرجاع الاستطلاع مع الخيارات
+    const pollWithOptions = await Poll.findByPk(poll.id, {
+      include: [
+        {
+          model: PollOption,
+          as: 'options',
+          attributes: ['id', 'text', 'order']
+        }
+      ]
+    });
+
     res.status(201).json({
       success: true,
       message: 'تم إنشاء الاستطلاع بنجاح',
-      data: poll
+      data: pollWithOptions
     });
   } catch (error) {
     next(error);
@@ -44,15 +74,65 @@ const getAllPolls = async (req, res, next) => {
           model: User,
           as: 'admin',
           attributes: ['id', 'name']
+        },
+        {
+          model: PollOption,
+          as: 'options',
+          attributes: ['id', 'text', 'order']
         }
       ],
       order: [['createdAt', 'DESC']]
     });
 
+    // الحصول على عدد الأصوات لكل خيار
+    const pollsWithStats = await Promise.all(
+      polls.map(async (poll) => {
+        const pollData = poll.toJSON();
+
+        if (pollData.options) {
+          // حساب عدد الأصوات لكل خيار
+          const optionsWithVotes = await Promise.all(
+            pollData.options.map(async (option) => {
+              const votesCount = await PollVote.count({
+                where: { optionId: option.id }
+              });
+
+              return {
+                id: option.id,
+                text: option.text,
+                order: option.order,
+                votesCount
+              };
+            })
+          );
+
+          // حساب مجموع الأصوات
+          const totalVotes = optionsWithVotes.reduce((sum, opt) => sum + opt.votesCount, 0);
+
+          // إضافة النسب المئوية
+          pollData.options = optionsWithVotes.map(option => ({
+            id: option.id,
+            text: option.text,
+            order: option.order,
+            votesCount: option.votesCount,
+            percentage: totalVotes > 0 ? parseFloat(((option.votesCount / totalVotes) * 100).toFixed(1)) : 0
+          }));
+
+          // ترتيب الخيارات حسب order
+          pollData.options.sort((a, b) => a.order - b.order);
+
+          // إضافة مجموع الأصوات للاستطلاع
+          pollData.totalVotes = totalVotes;
+        }
+
+        return pollData;
+      })
+    );
+
     res.status(200).json({
       success: true,
       count: polls.length,
-      data: polls
+      data: pollsWithStats
     });
   } catch (error) {
     next(error);
@@ -72,9 +152,9 @@ const getPollById = async (req, res, next) => {
           attributes: ['id', 'name']
         },
         {
-          model: PollVote,
-          as: 'votes',
-          attributes: ['id', 'vote', 'createdAt']
+          model: PollOption,
+          as: 'options',
+          attributes: ['id', 'text', 'order']
         }
       ]
     });
@@ -86,9 +166,42 @@ const getPollById = async (req, res, next) => {
       });
     }
 
+    // إضافة إحصائيات الأصوات
+    const pollData = poll.toJSON();
+
+    // حساب عدد الأصوات لكل خيار
+    let totalVotes = 0;
+    pollData.options = await Promise.all(
+      pollData.options.map(async (option) => {
+        const votesCount = await PollVote.count({
+          where: { optionId: option.id }
+        });
+
+        totalVotes += votesCount;
+
+        return {
+          id: option.id,
+          text: option.text,
+          order: option.order,
+          votesCount
+        };
+      })
+    );
+
+    // إضافة النسب المئوية
+    pollData.options = pollData.options.map(option => ({
+      ...option,
+      percentage: totalVotes > 0 ? parseFloat(((option.votesCount / totalVotes) * 100).toFixed(1)) : 0
+    }));
+
+    // ترتيب الخيارات
+    pollData.options.sort((a, b) => a.order - b.order);
+
+    pollData.totalVotes = totalVotes;
+
     res.status(200).json({
       success: true,
-      data: poll
+      data: pollData
     });
   } catch (error) {
     next(error);
@@ -100,14 +213,14 @@ const getPollById = async (req, res, next) => {
 // @access  Private
 const votePoll = async (req, res, next) => {
   try {
-    const { vote } = req.body;
+    const { optionId } = req.body;
     const pollId = req.params.id;
     const userId = req.user.id;
 
-    if (!vote) {
+    if (!optionId) {
       return res.status(400).json({
         success: false,
-        message: 'الصوت مطلوب'
+        message: 'يجب اختيار أحد الخيارات'
       });
     }
 
@@ -117,6 +230,18 @@ const votePoll = async (req, res, next) => {
       return res.status(404).json({
         success: false,
         message: 'الاستطلاع غير موجود'
+      });
+    }
+
+    // التحقق من وجود الخيار وأنه ينتمي للاستطلاع
+    const option = await PollOption.findOne({
+      where: { id: optionId, pollId }
+    });
+
+    if (!option) {
+      return res.status(404).json({
+        success: false,
+        message: 'الخيار غير موجود أو لا ينتمي لهذا الاستطلاع'
       });
     }
 
@@ -136,10 +261,10 @@ const votePoll = async (req, res, next) => {
     const points = calculatePollPoints(poll.pointsReward);
 
     // تسجيل التصويت
-    const pollVote = await PollVote.create({
+    await PollVote.create({
       pollId,
       userId,
-      vote,
+      optionId,
       pointsEarned: points
     });
 
@@ -165,7 +290,21 @@ const getPollResults = async (req, res, next) => {
   try {
     const pollId = req.params.id;
 
-    const poll = await Poll.findByPk(pollId);
+    const poll = await Poll.findByPk(pollId, {
+      include: [
+        {
+          model: User,
+          as: 'admin',
+          attributes: ['id', 'name']
+        },
+        {
+          model: PollOption,
+          as: 'options',
+          attributes: ['id', 'text', 'order']
+        }
+      ]
+    });
+
     if (!poll) {
       return res.status(404).json({
         success: false,
@@ -173,36 +312,56 @@ const getPollResults = async (req, res, next) => {
       });
     }
 
-    const votes = await PollVote.findAll({
-      where: { pollId },
-      attributes: ['vote'],
-      include: [
-        {
-          model: User,
-          as: 'user',
-          attributes: ['name']
-        }
-      ]
-    });
+    // حساب الإحصائيات
+    const pollData = poll.toJSON();
 
-    // تجميع النتائج
-    const results = {};
-    votes.forEach(v => {
-      if (results[v.vote]) {
-        results[v.vote]++;
-      } else {
-        results[v.vote] = 1;
-      }
-    });
+    let totalVotes = 0;
+    pollData.options = await Promise.all(
+      pollData.options.map(async (option) => {
+        // الحصول على الأصوات مع معلومات المستخدمين
+        const votes = await PollVote.findAll({
+          where: { optionId: option.id },
+          include: [
+            {
+              model: User,
+              as: 'user',
+              attributes: ['id', 'name']
+            }
+          ],
+          attributes: ['id', 'userId', 'createdAt']
+        });
+
+        const votesCount = votes.length;
+        totalVotes += votesCount;
+
+        return {
+          id: option.id,
+          text: option.text,
+          order: option.order,
+          votesCount,
+          voters: votes.map(v => ({
+            userId: v.user.id,
+            userName: v.user.name,
+            votedAt: v.createdAt
+          }))
+        };
+      })
+    );
+
+    // إضافة النسب المئوية
+    pollData.options = pollData.options.map(option => ({
+      ...option,
+      percentage: totalVotes > 0 ? parseFloat(((option.votesCount / totalVotes) * 100).toFixed(1)) : 0
+    }));
+
+    // ترتيب الخيارات
+    pollData.options.sort((a, b) => a.order - b.order);
+
+    pollData.totalVotes = totalVotes;
 
     res.status(200).json({
       success: true,
-      data: {
-        poll,
-        totalVotes: votes.length,
-        results,
-        votes
-      }
+      data: pollData
     });
   } catch (error) {
     next(error);
@@ -214,7 +373,7 @@ const getPollResults = async (req, res, next) => {
 // @access  Private/Admin
 const updatePoll = async (req, res, next) => {
   try {
-    const { title, description, pointsReward } = req.body;
+    const { title, description, pointsReward, options } = req.body;
 
     const poll = await Poll.findByPk(req.params.id);
 
@@ -225,16 +384,60 @@ const updatePoll = async (req, res, next) => {
       });
     }
 
+    // التحقق من وجود أصوات - إذا كان هناك أصوات، لا يمكن تعديل الخيارات
+    const existingVotes = await PollVote.count({
+      where: { pollId: req.params.id }
+    });
+
+    if (existingVotes > 0 && options) {
+      return res.status(400).json({
+        success: false,
+        message: 'لا يمكن تعديل خيارات الاستطلاع بعد بدء التصويت'
+      });
+    }
+
+    // تحديث معلومات الاستطلاع
     if (title) poll.title = title;
     if (description !== undefined) poll.description = description;
     if (pointsReward !== undefined) poll.pointsReward = pointsReward;
 
     await poll.save();
 
+    // تحديث الخيارات إذا تم تقديمها ولا توجد أصوات
+    if (options && Array.isArray(options) && options.length >= 2) {
+      // حذف الخيارات القديمة
+      await PollOption.destroy({
+        where: { pollId: poll.id }
+      });
+
+      // إنشاء الخيارات الجديدة
+      await Promise.all(
+        options.map((optionText, index) =>
+          PollOption.create({
+            pollId: poll.id,
+            text: optionText,
+            order: index
+          })
+        )
+      );
+    }
+
+    // إرجاع الاستطلاع المحدث مع الخيارات
+    const updatedPoll = await Poll.findByPk(poll.id, {
+      include: [
+        {
+          model: PollOption,
+          as: 'options',
+          attributes: ['id', 'text', 'order']
+        }
+      ],
+      order: [[{ model: PollOption, as: 'options' }, 'order', 'ASC']]
+    });
+
     res.status(200).json({
       success: true,
       message: 'تم تحديث الاستطلاع بنجاح',
-      data: poll
+      data: updatedPoll
     });
   } catch (error) {
     next(error);
