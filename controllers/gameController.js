@@ -1,13 +1,27 @@
 // Controller لإدارة الألعاب
 const { Game, UserGame } = require('../models');
 const { addPoints, calculateGamePoints } = require('../utils/pointsSystem');
+const fs = require('fs');
 
 // @desc    إنشاء لعبة جديدة
 // @route   POST /api/games
 // @access  Private/Admin
 const createGame = async (req, res, next) => {
   try {
-    const { type, title, content, educationalMessage, pointsReward } = req.body;
+    const { type, title, educationalMessage, pointsReward } = req.body;
+    let { content } = req.body;
+
+    // تحويل content من string إلى object إذا كان نص
+    if (typeof content === 'string') {
+      try {
+        content = JSON.parse(content);
+      } catch (e) {
+        return res.status(400).json({
+          success: false,
+          message: 'محتوى اللعبة غير صالح (JSON غير صحيح)'
+        });
+      }
+    }
 
     if (!type || !title || !content) {
       return res.status(400).json({
@@ -50,6 +64,28 @@ const createGame = async (req, res, next) => {
       }
     }
 
+    // التحقق من صحة بنية البازل
+    if (type === 'puzzle') {
+      if (!content.pieces || !content.difficulty) {
+        return res.status(400).json({
+          success: false,
+          message: 'يجب أن يحتوي محتوى البازل على pieces و difficulty'
+        });
+      }
+
+      // التحقق من رفع صورة للبازل
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          message: 'يجب رفع صورة للبازل'
+        });
+      }
+
+      // إضافة مسار الصورة إلى المحتوى
+      // req.file.path يحتوي بالفعل على uploads/ لذلك نضيف / فقط في البداية
+      content.imageUrl = `/${req.file.path.replace(/\\/g, '/')}`;
+    }
+
     const game = await Game.create({
       type,
       title,
@@ -64,6 +100,12 @@ const createGame = async (req, res, next) => {
       data: game
     });
   } catch (error) {
+    // حذف الصورة المرفوعة في حالة حدوث خطأ
+    if (req.file) {
+      fs.unlink(req.file.path, (err) => {
+        if (err) console.error('خطأ في حذف الصورة:', err);
+      });
+    }
     next(error);
   }
 };

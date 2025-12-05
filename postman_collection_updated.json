@@ -180,6 +180,72 @@
           }
         },
         {
+          "name": "إنشاء لعبة بازل - Create Puzzle (Admin) - مع صورة",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('gameId', jsonData.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "type",
+                  "value": "puzzle",
+                  "type": "text"
+                },
+                {
+                  "key": "title",
+                  "value": "بازل - القيم المجتمعية",
+                  "type": "text"
+                },
+                {
+                  "key": "content",
+                  "value": "{\"pieces\": 16, \"difficulty\": \"medium\", \"description\": \"قم بترتيب قطع البازل لتكوين صورة تعبر عن القيم المجتمعية\"}",
+                  "type": "text"
+                },
+                {
+                  "key": "educationalMessage",
+                  "value": "رائع! تماماً كما جمعت قطع البازل، يمكننا بناء مجتمع قوي بتجميع جهودنا",
+                  "type": "text"
+                },
+                {
+                  "key": "pointsReward",
+                  "value": "20",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": [],
+                  "description": "اختر صورة البازل من جهازك (JPEG, PNG, GIF, WEBP - حد أقصى 5MB)"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/games",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "games"]
+            }
+          }
+        },
+        {
           "name": "جميع الألعاب - Get All Games",
           "event": [
             {

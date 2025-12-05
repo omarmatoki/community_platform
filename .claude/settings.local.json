@@ -9,7 +9,8 @@
       "Bash(npm run seed:*)",
       "Bash(node:*)",
       "Bash(taskkill:*)",
-      "Bash(timeout /t 2 /nobreak)"
+      "Bash(timeout /t 2 /nobreak)",
+      "Bash(npm install:*)"
     ],
     "deny": [],
     "ask": []

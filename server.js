@@ -23,6 +23,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// خدمة الملفات الثابتة (الصور المرفوعة)
+app.use('/uploads', express.static('uploads'));
+
 // Logger Middleware (في وضع التطوير)
 if (process.env.NODE_ENV === 'development') {
   app.use((req, res, next) => {
