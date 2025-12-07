@@ -3,6 +3,7 @@ const { sequelize } = require('../config/database');
 
 // استيراد جميع النماذج
 const User = require('./User')(sequelize);
+const OTP = require('./OTP')(sequelize);
 const Category = require('./Category')(sequelize);
 const Article = require('./Article')(sequelize);
 const ArticleRead = require('./ArticleRead')(sequelize);
@@ -293,6 +294,7 @@ SessionPollVote.belongsTo(User, {
 module.exports = {
   sequelize,
   User,
+  OTP,
   Category,
   Article,
   ArticleRead,

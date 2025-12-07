@@ -5,3 +5,7 @@ node_modules/
 
 # Uploaded files
 uploads/
+
+# WhatsApp session data
+.wwebjs_auth/
+.wwebjs_cache/

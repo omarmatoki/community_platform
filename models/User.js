@@ -23,18 +23,26 @@ module.exports = (sequelize) => {
         }
       }
     },
-    email: {
+    phoneNumber: {
       type: DataTypes.STRING,
       allowNull: false,
       unique: {
         args: true,
-        msg: 'البريد الإلكتروني مستخدم بالفعل'
+        msg: 'رقم الهاتف مستخدم بالفعل'
       },
       validate: {
-        isEmail: {
-          msg: 'البريد الإلكتروني غير صالح'
+        notEmpty: {
+          msg: 'رقم الهاتف مطلوب'
+        },
+        is: {
+          args: /^\+?[1-9]\d{1,14}$/,
+          msg: 'رقم الهاتف غير صالح (يجب أن يكون بالصيغة الدولية مثل +963998107722)'
         }
       }
+    },
+    isPhoneVerified: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
     },
     password: {
       type: DataTypes.STRING,

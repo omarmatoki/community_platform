@@ -10,7 +10,11 @@
       "Bash(node:*)",
       "Bash(taskkill:*)",
       "Bash(timeout /t 2 /nobreak)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(timeout /t 10 /nobreak)",
+      "Bash(findstr:*)",
+      "Bash(copy controllersauthController.js controllersauthController.backup.js)",
+      "Bash(netstat:*)"
     ],
     "deny": [],
     "ask": []

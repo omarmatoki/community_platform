@@ -4,6 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const { sequelize, testConnection } = require('./config/database');
 const { errorHandler, notFound } = require('./middlewares/errorHandler');
+const whatsappService = require('./services/whatsappService');
 
 // استيراد المسارات
 const authRoutes = require('./routes/authRoutes');
@@ -38,7 +39,7 @@ if (process.env.NODE_ENV === 'development') {
 app.get('/', (req, res) => {
   res.json({
     success: true,
-    message: 'مرحباً بك في منصة تعزيز الوعي المجتمعي',
+    message: 'مرحباً بك في منصة صوتنا يبني',
     version: '1.0.0',
     endpoints: {
       auth: '/api/auth',
@@ -82,6 +83,13 @@ const startServer = async () => {
     // في الإنتاج، استخدم { alter: true } أو migrations
 await sequelize.sync({ force: false, alter: false });
     console.log('✓ تمت مزامنة قاعدة البيانات بنجاح');
+
+    // بدء خدمة WhatsApp
+    console.log('🔄 جاري الاتصال بـ WhatsApp...');
+    whatsappService.connect().catch(error => {
+      console.error('⚠️  تحذير: فشل الاتصال بـ WhatsApp:', error.message);
+      console.log('💡 يمكنك تشغيل: node initWhatsApp.js لربط WhatsApp يدوياً');
+    });
 
     // بدء السيرفر
     app.listen(PORT, () => {
