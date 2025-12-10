@@ -1,0 +1,593 @@
+{
+  "info": {
+    "name": "Backend API Collection", 
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{BASE_URL}}/api/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"أحمد محمد\",\n  \"phoneNumber\": \"+963998107722\",\n  \"password\": \"123456\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Verify OTP",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{BASE_URL}}/api/auth/verify-otp",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phoneNumber\": \"+963998107722\",\n  \"otp\": \"123456\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{BASE_URL}}/api/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phoneNumber\": \"+963998107722\",\n  \"password\": \"123456\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Resend OTP",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{BASE_URL}}/api/auth/resend-otp",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phoneNumber\": \"+963998107722\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{TOKEN}}"}],
+            "url": "{{BASE_URL}}/api/users"
+          }
+        },
+        {
+          "name": "Get User By ID",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{TOKEN}}"}],
+            "url": "{{BASE_URL}}/api/users/:id"
+          }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{TOKEN}}"}
+            ],
+            "url": "{{BASE_URL}}/api/users/:id",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"اسم جديد\",\n  \"phoneNumber\": \"+963998107723\",\n  \"role\": \"admin\",\n  \"points\": 100\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{TOKEN}}"}],
+            "url": "{{BASE_URL}}/api/users/:id"
+          }
+        },
+        {
+          "name": "Get User Points",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{TOKEN}}"}],
+            "url": "{{BASE_URL}}/api/users/:id/points"
+          }
+        },
+        {
+          "name": "Get Leaderboard",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{BASE_URL}}/api/users/leaderboard?limit=10"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Categories",
+      "item": [
+        {
+          "name": "Get All Categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{BASE_URL}}/api/categories"
+          }
+        },
+        {
+          "name": "Get Category By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{BASE_URL}}/api/categories/:id"
+          }
+        },
+        {
+          "name": "Create Category",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{TOKEN}}"}
+            ],
+            "url": "{{BASE_URL}}/api/categories",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"تصنيف جديد\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Category",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{TOKEN}}"}
+            ],
+            "url": "{{BASE_URL}}/api/categories/:id",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"تصنيف محدث\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Category",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{TOKEN}}"}],
+            "url": "{{BASE_URL}}/api/categories/:id"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Articles",
+      "item": [
+        {
+          "name": "Get All Articles",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{BASE_URL}}/api/articles"
+          }
+        },
+        {
+          "name": "Get Article By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{BASE_URL}}/api/articles/:id"
+          }
+        },
+        {
+          "name": "Get Articles By Category",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{BASE_URL}}/api/articles/category/:categoryId"
+          }
+        },
+        {
+          "name": "Create Article",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{TOKEN}}"}
+            ],
+            "url": "{{BASE_URL}}/api/articles",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"عنوان المقال\",\n  \"content\": \"محتوى المقال هنا...\",\n  \"categoryId\": \"uuid-here\",\n  \"author\": \"أحمد محمد\",\n  \"source\": \"موقع الأخبار\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Article",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{TOKEN}}"}
+            ],
+            "url": "{{BASE_URL}}/api/articles/:id",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"عنوان محدث\",\n  \"content\": \"محتوى محدث\",\n  \"categoryId\": \"uuid-here\",\n  \"author\": \"كاتب آخر\",\n  \"source\": \"مصدر محدث\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Article",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{TOKEN}}"}],
+            "url": "{{BASE_URL}}/api/articles/:id"
+          }
+        },
+        {
+          "name": "Mark Article As Read",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{TOKEN}}"}],
+            "url": "{{BASE_URL}}/api/articles/:id/read"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Surveys",
+      "item": [
+        {
+          "name": "Get All Surveys",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{BASE_URL}}/api/surveys"
+          }
+        },
+        {
+          "name": "Get Survey By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{BASE_URL}}/api/surveys/:id"
+          }
+        },
+        {
+          "name": "Create Survey",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{TOKEN}}"}
+            ],
+            "url": "{{BASE_URL}}/api/surveys",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"استبيان جديد\",\n  \"articleId\": \"uuid-here\",\n  \"questions\": [\n    {\n      \"text\": \"ما هي العاصمة؟\",\n      \"options\": [\n        {\"text\": \"دمشق\", \"isCorrect\": true},\n        {\"text\": \"بيروت\", \"isCorrect\": false}\n      ]\n    }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Survey",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{TOKEN}}"}
+            ],
+            "url": "{{BASE_URL}}/api/surveys/:id",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"استبيان محدث\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Survey",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{TOKEN}}"}],
+            "url": "{{BASE_URL}}/api/surveys/:id"
+          }
+        },
+        {
+          "name": "Submit Survey Answers",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{TOKEN}}"}
+            ],
+            "url": "{{BASE_URL}}/api/surveys/:id/submit",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"answers\": [\n    {\"questionId\": \"uuid-here\", \"optionId\": \"uuid-here\"}\n  ]\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Polls",
+      "item": [
+        {
+          "name": "Get All Polls",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{BASE_URL}}/api/polls"
+          }
+        },
+        {
+          "name": "Get Poll By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{BASE_URL}}/api/polls/:id"
+          }
+        },
+        {
+          "name": "Create Poll",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{TOKEN}}"}
+            ],
+            "url": "{{BASE_URL}}/api/polls",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"ما هو رأيك؟\",\n  \"options\": [\n    {\"text\": \"موافق\"},\n    {\"text\": \"غير موافق\"}\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Vote Poll",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{TOKEN}}"}
+            ],
+            "url": "{{BASE_URL}}/api/polls/:id/vote",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"optionId\": \"uuid-here\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Poll",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{TOKEN}}"}],
+            "url": "{{BASE_URL}}/api/polls/:id"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Games",
+      "item": [
+        {
+          "name": "Get All Games",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{BASE_URL}}/api/games"
+          }
+        },
+        {
+          "name": "Get Game By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{BASE_URL}}/api/games/:id"
+          }
+        },
+        {
+          "name": "Create Game",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{TOKEN}}"}
+            ],
+            "url": "{{BASE_URL}}/api/games",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"لعبة جديدة\",\n  \"type\": \"puzzle\",\n  \"url\": \"https://example.com/game\",\n  \"pointsReward\": 15\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Game",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{TOKEN}}"}
+            ],
+            "url": "{{BASE_URL}}/api/games/:id",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"لعبة محدثة\",\n  \"pointsReward\": 20\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Game",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{TOKEN}}"}],
+            "url": "{{BASE_URL}}/api/games/:id"
+          }
+        },
+        {
+          "name": "Complete Game",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{TOKEN}}"}],
+            "url": "{{BASE_URL}}/api/games/:id/complete"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Discussion Sessions",
+      "item": [
+        {
+          "name": "Get All Sessions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{BASE_URL}}/api/discussions"
+          }
+        },
+        {
+          "name": "Get Session By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{BASE_URL}}/api/discussions/:id"
+          }
+        },
+        {
+          "name": "Create Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{TOKEN}}"}
+            ],
+            "url": "{{BASE_URL}}/api/discussions",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"جلسة حوارية جديدة\",\n  \"description\": \"وصف الجلسة\",\n  \"scheduledAt\": \"2025-12-15T10:00:00Z\",\n  \"location\": \"قاعة المؤتمرات\",\n  \"maxAttendees\": 50\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Session",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{TOKEN}}"}
+            ],
+            "url": "{{BASE_URL}}/api/discussions/:id",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"جلسة محدثة\",\n  \"maxAttendees\": 100\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Session",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{TOKEN}}"}],
+            "url": "{{BASE_URL}}/api/discussions/:id"
+          }
+        },
+        {
+          "name": "Register Attendance",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{TOKEN}}"}],
+            "url": "{{BASE_URL}}/api/discussions/:id/register"
+          }
+        },
+        {
+          "name": "Mark Attendance",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{TOKEN}}"}
+            ],
+            "url": "{{BASE_URL}}/api/discussions/:id/attend",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"qrCode\": \"qr-code-here\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Session Attendees",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{TOKEN}}"}],
+            "url": "{{BASE_URL}}/api/discussions/:id/attendees"
+          }
+        },
+        {
+          "name": "Create Session Poll",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{TOKEN}}"}
+            ],
+            "url": "{{BASE_URL}}/api/discussions/:id/polls",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"سؤال الاستطلاع\",\n  \"options\": [\n    {\"text\": \"خيار 1\"},\n    {\"text\": \"خيار 2\"}\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Vote Session Poll",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{TOKEN}}"}
+            ],
+            "url": "{{BASE_URL}}/api/discussions/:sessionId/polls/:pollId/vote",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"optionId\": \"uuid-here\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Session Poll Results",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{TOKEN}}"}],
+            "url": "{{BASE_URL}}/api/discussions/:sessionId/polls/:pollId/results"
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "BASE_URL",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "TOKEN",
+      "value": ""
+    }
+  ]
+}

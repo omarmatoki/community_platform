@@ -7,12 +7,12 @@ const { addPoints, POINTS_CONFIG } = require('../utils/pointsSystem');
 // @access  Private/Admin
 const createArticle = async (req, res, next) => {
   try {
-    const { title, content, categoryId } = req.body;
+    const { title, content, categoryId, author, source } = req.body;
 
     if (!title || !content || !categoryId) {
       return res.status(400).json({
         success: false,
-        message: 'جميع الحقول مطلوبة'
+        message: 'العنوان والمحتوى والتصنيف مطلوبة'
       });
     }
 
@@ -29,6 +29,8 @@ const createArticle = async (req, res, next) => {
       title,
       content,
       categoryId,
+      author: author || null,
+      source: source || null,
       adminId: req.user.id
     });
 
@@ -156,7 +158,7 @@ const getArticlesByCategory = async (req, res, next) => {
 // @access  Private/Admin
 const updateArticle = async (req, res, next) => {
   try {
-    const { title, content, categoryId } = req.body;
+    const { title, content, categoryId, author, source } = req.body;
 
     const article = await Article.findByPk(req.params.id);
 
@@ -169,6 +171,8 @@ const updateArticle = async (req, res, next) => {
 
     if (title) article.title = title;
     if (content) article.content = content;
+    if (author !== undefined) article.author = author || null;
+    if (source !== undefined) article.source = source || null;
     if (categoryId) {
       // التحقق من وجود التصنيف
       const category = await Category.findByPk(categoryId);

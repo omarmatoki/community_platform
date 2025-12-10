@@ -27,6 +27,26 @@ module.exports = (sequelize) => {
         }
       }
     },
+    author: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      validate: {
+        len: {
+          args: [2, 100],
+          msg: 'اسم الكاتب يجب أن يكون بين 2 و 100 حرف'
+        }
+      }
+    },
+    source: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      validate: {
+        len: {
+          args: [2, 200],
+          msg: 'المصدر يجب أن يكون بين 2 و 200 حرف'
+        }
+      }
+    },
     categoryId: {
       type: DataTypes.UUID,
       allowNull: false,

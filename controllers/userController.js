@@ -52,7 +52,7 @@ const getUserById = async (req, res, next) => {
 // @access  Private/Admin
 const updateUser = async (req, res, next) => {
   try {
-    const { name, email, role, points } = req.body;
+    const { name, phoneNumber, role, points } = req.body;
 
     const user = await User.findByPk(req.params.id);
 
@@ -64,7 +64,7 @@ const updateUser = async (req, res, next) => {
     }
 
     if (name) user.name = name;
-    if (email) user.email = email;
+    if (phoneNumber) user.phoneNumber = phoneNumber;
     if (role) user.role = role;
     if (points !== undefined) user.points = points;
 

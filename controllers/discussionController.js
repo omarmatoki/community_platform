@@ -203,7 +203,7 @@ const getSessionAttendees = async (req, res, next) => {
         {
           model: User,
           as: 'user',
-          attributes: ['id', 'name', 'email']
+          attributes: ['id', 'name', 'phoneNumber']
         }
       ]
     });

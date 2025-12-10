@@ -107,7 +107,7 @@ const calculateSessionPoints = (customPoints = null) => {
 const getLeaderboard = async (limit = 10) => {
   try {
     const topUsers = await User.findAll({
-      attributes: ['id', 'name', 'email', 'points', 'createdAt'],
+      attributes: ['id', 'name', 'phoneNumber', 'points', 'createdAt'],
       order: [['points', 'DESC']],
       limit: parseInt(limit)
     });
@@ -116,7 +116,7 @@ const getLeaderboard = async (limit = 10) => {
       rank: index + 1,
       id: user.id,
       name: user.name,
-      email: user.email,
+      phoneNumber: user.phoneNumber,
       points: user.points,
       memberSince: user.createdAt
     }));
