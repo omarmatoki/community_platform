@@ -99,7 +99,7 @@ const getSurveyByArticleId = async (req, res, next) => {
             {
               model: Option,
               as: 'options',
-              attributes: ['id', 'optionText'] // إخفاء isCorrect
+              attributes: ['id', 'optionText', 'isCorrect']
             }
           ]
         }
