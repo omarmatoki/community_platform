@@ -14,7 +14,8 @@
       "Bash(timeout /t 10 /nobreak)",
       "Bash(findstr:*)",
       "Bash(copy controllersauthController.js controllersauthController.backup.js)",
-      "Bash(netstat:*)"
+      "Bash(netstat:*)",
+      "Bash(ls:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,6 +1,10 @@
 // Controller لإدارة الجلسات الحوارية
 const { DiscussionSession, SessionAttendance, User, SessionPoll, SessionPollOption, SessionPollVote } = require('../models');
 const { addPoints, calculateSessionPoints } = require('../utils/pointsSystem');
+const whatsappService = require('../services/whatsappService');
+
+// دالة مساعدة للتأخير (sleep)
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 // @desc    إنشاء جلسة حوارية جديدة
 // @route   POST /api/discussions
@@ -25,11 +29,58 @@ const createSession = async (req, res, next) => {
       adminId: req.user.id
     });
 
+    // إرسال الاستجابة للمستخدم فوراً
     res.status(201).json({
       success: true,
-      message: 'تم إنشاء الجلسة الحوارية بنجاح',
+      message: 'تم إنشاء الجلسة الحوارية بنجاح، وسيتم إرسال الإشعارات للمستخدمين',
       data: session
     });
+
+    // إرسال إشعارات واتساب للمستخدمين في الخلفية
+    (async () => {
+      try {
+        // جلب جميع المستخدمين (غير الأدمن)
+        const users = await User.findAll({
+          where: {
+            role: 'user'
+          },
+          attributes: ['id', 'name', 'phoneNumber']
+        });
+
+        console.log(`📤 بدء إرسال إشعارات الجلسة الحوارية إلى ${users.length} مستخدم...`);
+
+        const delay = parseInt(process.env.WHATSAPP_MESSAGE_DELAY) || 30000; // 30 ثانية افتراضياً
+        let successCount = 0;
+        let failCount = 0;
+
+        // إرسال الرسائل مع تأخير بين كل رسالة
+        for (let i = 0; i < users.length; i++) {
+          const user = users[i];
+
+          const success = await whatsappService.sendSessionNotification(user, {
+            title: session.title,
+            description: session.description,
+            dateTime: session.dateTime
+          });
+
+          if (success) {
+            successCount++;
+          } else {
+            failCount++;
+          }
+
+          // انتظار قبل إرسال الرسالة التالية (ما عدا بعد الرسالة الأخيرة)
+          if (i < users.length - 1) {
+            console.log(`⏳ انتظار ${delay / 1000} ثانية قبل إرسال الرسالة التالية...`);
+            await sleep(delay);
+          }
+        }
+
+        console.log(`✅ اكتمل إرسال الإشعارات: ${successCount} نجح، ${failCount} فشل`);
+      } catch (error) {
+        console.error('❌ خطأ في إرسال إشعارات الجلسة:', error);
+      }
+    })();
   } catch (error) {
     next(error);
   }

@@ -110,6 +110,61 @@ class WhatsAppService {
     return this.isReady;
   }
 
+  // إرسال إشعار جلسة حوارية
+  async sendSessionNotification(user, sessionData) {
+    try {
+      if (!this.isReady) {
+        throw new Error('WhatsApp غير متصل. يرجى الانتظار حتى يتم الاتصال.');
+      }
+
+      // تنسيق رقم الهاتف
+      const formattedNumber = this.formatPhoneNumber(user.phoneNumber);
+      const chatId = `${formattedNumber}@c.us`;
+
+      // تنسيق التاريخ والوقت
+      const sessionDate = new Date(sessionData.dateTime);
+      const dateOptions = {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      };
+      const timeOptions = {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      };
+
+      const formattedDate = sessionDate.toLocaleDateString('ar-SA', dateOptions);
+      const formattedTime = sessionDate.toLocaleTimeString('ar-SA', timeOptions);
+
+      // رابط صفحة الجلسات
+      const frontendUrl = process.env.FRONTEND_URL || 'http://192.168.0.5:3000';
+      const sessionUrl = `${frontendUrl}/discussions`;
+
+      // نص الرسالة
+      const message = `مرحباً ${user.name}! 👋\n\n` +
+        `🎯 يسعدنا دعوتك لحضور جلسة حوارية جديدة:\n\n` +
+        `📌 *${sessionData.title}*\n\n` +
+        `📅 التاريخ: ${formattedDate}\n` +
+        `🕐 الوقت: ${formattedTime}\n\n` +
+        (sessionData.description ? `📝 الوصف: ${sessionData.description}\n\n` : '') +
+        `🔗 للاطلاع على تفاصيل الجلسة والتسجيل:\n${sessionUrl}\n\n` +
+        `💎 سنكون ممتنين جداً لحضورك ومشاركتك الفعالة معنا!\n\n` +
+        `✨ منصة صوتنا يبني`;
+
+      // إرسال الرسالة
+      await this.client.sendMessage(chatId, message);
+      console.log(`✅ تم إرسال إشعار الجلسة إلى ${user.name} (${user.phoneNumber})`);
+
+      return true;
+    } catch (error) {
+      console.error(`❌ خطأ في إرسال إشعار الجلسة إلى ${user.phoneNumber}:`, error);
+      // لا نرمي الخطأ لنتمكن من الاستمرار في إرسال الرسائل للمستخدمين الآخرين
+      return false;
+    }
+  }
+
   // فصل الاتصال
   async disconnect() {
     if (this.client) {

@@ -37,6 +37,11 @@ module.exports = (sequelize) => {
       validate: {
         min: 0
       }
+    },
+    expiryDate: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      comment: 'تاريخ ووقت انتهاء الاستطلاع'
     }
   }, {
     tableName: 'polls',

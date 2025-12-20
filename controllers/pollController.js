@@ -7,7 +7,7 @@ const { addPoints, calculatePollPoints } = require('../utils/pointsSystem');
 // @access  Private/Admin
 const createPoll = async (req, res, next) => {
   try {
-    const { title, description, pointsReward, options } = req.body;
+    const { title, description, pointsReward, options, expiryDate } = req.body;
 
     if (!title) {
       return res.status(400).json({
@@ -28,7 +28,8 @@ const createPoll = async (req, res, next) => {
       title,
       description,
       adminId: req.user.id,
-      pointsReward: pointsReward || 5
+      pointsReward: pointsReward || 5,
+      expiryDate: expiryDate ? new Date(expiryDate) : null
     });
 
     // إنشاء الخيارات
@@ -233,6 +234,14 @@ const votePoll = async (req, res, next) => {
       });
     }
 
+    // التحقق من صلاحية الاستطلاع
+    if (poll.expiryDate && new Date() > new Date(poll.expiryDate)) {
+      return res.status(400).json({
+        success: false,
+        message: 'انتهت صلاحية هذا الاستطلاع'
+      });
+    }
+
     // التحقق من وجود الخيار وأنه ينتمي للاستطلاع
     const option = await PollOption.findOne({
       where: { id: optionId, pollId }
@@ -373,7 +382,7 @@ const getPollResults = async (req, res, next) => {
 // @access  Private/Admin
 const updatePoll = async (req, res, next) => {
   try {
-    const { title, description, pointsReward, options } = req.body;
+    const { title, description, pointsReward, options, expiryDate } = req.body;
 
     const poll = await Poll.findByPk(req.params.id);
 
@@ -400,6 +409,7 @@ const updatePoll = async (req, res, next) => {
     if (title) poll.title = title;
     if (description !== undefined) poll.description = description;
     if (pointsReward !== undefined) poll.pointsReward = pointsReward;
+    if (expiryDate !== undefined) poll.expiryDate = expiryDate ? new Date(expiryDate) : null;
 
     await poll.save();
 
