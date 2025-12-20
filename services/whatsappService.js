@@ -15,7 +15,7 @@ class WhatsAppService {
         dataPath: '.wwebjs_auth'
       }),
       puppeteer: {
-        headless: true,
+        headless: 'new',
         args: [
           '--no-sandbox',
           '--disable-setuid-sandbox',
