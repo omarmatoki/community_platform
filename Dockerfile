@@ -1,31 +1,50 @@
-# استخدام Node.js 18 كصورة أساسية
-FROM node:18-alpine
+# استخدام Node.js 18 على Debian (أفضل من Alpine لـ Puppeteer)
+FROM node:18-slim
 
-# تثبيت Chromium والمكتبات المطلوبة
-RUN apk add --no-cache \
-    chromium \
-    nss \
-    freetype \
-    harfbuzz \
+# تثبيت المكتبات المطلوبة لـ Puppeteer و Chromium
+RUN apt-get update && apt-get install -y \
+    wget \
+    gnupg \
     ca-certificates \
-    ttf-freefont \
-    libx11 \
-    libxcomposite \
-    libxdamage \
-    libxrandr \
-    libxkbcommon \
-    libgbm \
-    libasound \
-    atk \
-    atk-bridge \
-    pango \
-    gtk+3.0 \
-    dbus \
-    ttf-dejavu
+    fonts-liberation \
+    libappindicator3-1 \
+    libasound2 \
+    libatk-bridge2.0-0 \
+    libatk1.0-0 \
+    libc6 \
+    libcairo2 \
+    libcups2 \
+    libdbus-1-3 \
+    libexpat1 \
+    libfontconfig1 \
+    libgbm1 \
+    libgcc1 \
+    libglib2.0-0 \
+    libgtk-3-0 \
+    libnspr4 \
+    libnss3 \
+    libpango-1.0-0 \
+    libpangocairo-1.0-0 \
+    libstdc++6 \
+    libx11-6 \
+    libx11-xcb1 \
+    libxcb1 \
+    libxcomposite1 \
+    libxcursor1 \
+    libxdamage1 \
+    libxext6 \
+    libxfixes3 \
+    libxi6 \
+    libxrandr2 \
+    libxrender1 \
+    libxss1 \
+    libxtst6 \
+    lsb-release \
+    xdg-utils \
+    && rm -rf /var/lib/apt/lists/*
 
 # تعيين متغيرات البيئة لـ Puppeteer
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=false
 
 # إنشاء مجلد التطبيق
 WORKDIR /app

@@ -10,22 +10,37 @@ class WhatsAppService {
   }
 
   initializeClient() {
+    // تكوين Puppeteer بناءً على البيئة
+    const puppeteerConfig = {
+      headless: 'new',
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-accelerated-2d-canvas',
+        '--no-first-run',
+        '--no-zygote',
+        '--disable-gpu',
+        '--disable-software-rasterizer',
+        '--disable-extensions'
+      ]
+    };
+
+    // في بيئة production على Docker، استخدام Chromium المثبت من النظام إذا كان موجوداً
+    if (process.env.NODE_ENV === 'production') {
+      const fs = require('fs');
+      const chromiumPath = '/usr/bin/chromium';
+
+      if (fs.existsSync(chromiumPath)) {
+        puppeteerConfig.executablePath = chromiumPath;
+      }
+    }
+
     this.client = new Client({
       authStrategy: new LocalAuth({
         dataPath: '.wwebjs_auth'
       }),
-      puppeteer: {
-        headless: 'new',
-        args: [
-          '--no-sandbox',
-          '--disable-setuid-sandbox',
-          '--disable-dev-shm-usage',
-          '--disable-accelerated-2d-canvas',
-          '--no-first-run',
-          '--no-zygote',
-          '--disable-gpu'
-        ]
-      }
+      puppeteer: puppeteerConfig
     });
 
     // عرض QR Code للمسح
