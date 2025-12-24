@@ -5,7 +5,8 @@ const {
   createSurvey,
   getSurveyByArticleId,
   submitSurveyAnswers,
-  getUserSurveyResults
+  getUserSurveyResults,
+  updateSurvey
 } = require('../controllers/surveyController');
 const { protect } = require('../middlewares/authMiddleware');
 const { authorize } = require('../middlewares/adminMiddleware');
@@ -19,5 +20,6 @@ router.get('/:surveyId/results', protect, getUserSurveyResults);
 
 // مسارات الأدمن
 router.post('/', protect, authorize('admin'), createSurvey);
+router.put('/:id', protect, authorize('admin'), updateSurvey);
 
 module.exports = router;

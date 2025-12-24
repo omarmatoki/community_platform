@@ -218,6 +218,107 @@ const submitSurveyAnswers = async (req, res, next) => {
   }
 };
 
+// @desc    تعديل استبيان مع الأسئلة والخيارات
+// @route   PUT /api/surveys/:id
+// @access  Private/Admin
+const updateSurvey = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { articleId, title, questions } = req.body;
+
+    // التحقق من وجود الاستبيان
+    const survey = await Survey.findByPk(id);
+    if (!survey) {
+      return res.status(404).json({
+        success: false,
+        message: 'الاستبيان غير موجود'
+      });
+    }
+
+    // التحقق من وجود المقال إذا تم تغييره
+    if (articleId && articleId !== survey.articleId) {
+      const article = await Article.findByPk(articleId);
+      if (!article) {
+        return res.status(404).json({
+          success: false,
+          message: 'المقال غير موجود'
+        });
+      }
+
+      // التحقق من عدم وجود استبيان آخر للمقال الجديد
+      const existingSurvey = await Survey.findOne({
+        where: {
+          articleId,
+          id: { [require('sequelize').Op.ne]: id }
+        }
+      });
+      if (existingSurvey) {
+        return res.status(400).json({
+          success: false,
+          message: 'يوجد استبيان بالفعل لهذا المقال'
+        });
+      }
+    }
+
+    // تحديث بيانات الاستبيان
+    if (title) survey.title = title;
+    if (articleId) survey.articleId = articleId;
+    await survey.save();
+
+    // تحديث الأسئلة والخيارات إذا تم إرسالها
+    if (questions && questions.length > 0) {
+      // حذف الأسئلة والخيارات القديمة
+      const oldQuestions = await Question.findAll({ where: { surveyId: id } });
+      for (const oldQuestion of oldQuestions) {
+        await Option.destroy({ where: { questionId: oldQuestion.id } });
+      }
+      await Question.destroy({ where: { surveyId: id } });
+
+      // إنشاء الأسئلة والخيارات الجديدة
+      for (const questionData of questions) {
+        const question = await Question.create({
+          surveyId: survey.id,
+          questionText: questionData.questionText
+        });
+
+        if (questionData.options && questionData.options.length > 0) {
+          for (const optionData of questionData.options) {
+            await Option.create({
+              questionId: question.id,
+              optionText: optionData.optionText,
+              isCorrect: optionData.isCorrect || false
+            });
+          }
+        }
+      }
+    }
+
+    // إعادة جلب الاستبيان مع الأسئلة والخيارات
+    const updatedSurvey = await Survey.findByPk(survey.id, {
+      include: [
+        {
+          model: Question,
+          as: 'questions',
+          include: [
+            {
+              model: Option,
+              as: 'options'
+            }
+          ]
+        }
+      ]
+    });
+
+    res.status(200).json({
+      success: true,
+      message: 'تم تحديث الاستبيان بنجاح',
+      data: updatedSurvey
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // @desc    الحصول على نتائج الاستبيان للمستخدم
 // @route   GET /api/surveys/:surveyId/results
 // @access  Private
@@ -274,5 +375,6 @@ module.exports = {
   createSurvey,
   getSurveyByArticleId,
   submitSurveyAnswers,
+  updateSurvey,
   getUserSurveyResults
 };
