@@ -1,0 +1,50 @@
+{
+  "type": "crossword",
+  "title": "اختبار: الكلمات المتقاطعة - النظام الجديد (يبدأ من 1)",
+  "content": {
+    "words": [
+      {
+        "number": 1,
+        "direction": "across",
+        "question": "المساهمة الفعالة في حل القضايا المجتمعية؟",
+        "answer": "مشاركة",
+        "position": {
+          "row": 1,
+          "col": 1
+        }
+      },
+      {
+        "number": 2,
+        "direction": "down",
+        "question": "فهم احتياجات ومشاعر الآخرين؟",
+        "answer": "تعاطف",
+        "position": {
+          "row": 1,
+          "col": 4
+        }
+      },
+      {
+        "number": 3,
+        "direction": "across",
+        "question": "العمل المشترك لتحقيق هدف واحد؟",
+        "answer": "تعاون",
+        "position": {
+          "row": 3,
+          "col": 1
+        }
+      },
+      {
+        "number": 4,
+        "direction": "down",
+        "question": "توفير الحماية والدعم للآخرين؟",
+        "answer": "رعاية",
+        "position": {
+          "row": 1,
+          "col": 7
+        }
+      }
+    ]
+  },
+  "educationalMessage": "القيم المجتمعية الأساسية تبني مجتمعاً قوياً ومترابطاً!",
+  "pointsReward": 20
+}

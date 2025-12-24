@@ -39,7 +39,7 @@ const createGame = async (req, res, next) => {
         });
       }
 
-      // التحقق من كل كلمة
+      // التحقق من كل كلمة وتحويل المواقع
       for (const word of content.words) {
         if (!word.number || !word.direction || !word.question || !word.answer || !word.position) {
           return res.status(400).json({
@@ -55,12 +55,17 @@ const createGame = async (req, res, next) => {
           });
         }
 
-        if (!word.position.row || word.position.row < 0 || !word.position.col || word.position.col < 0) {
+        // التحقق من أن المواقع تبدأ من 1 على الأقل (لأننا سنطرح 1)
+        if (word.position.row === undefined || word.position.row < 1 || word.position.col === undefined || word.position.col < 1) {
           return res.status(400).json({
             success: false,
-            message: 'موقع الكلمة يجب أن يحتوي على row و col صحيحين'
+            message: 'موقع الكلمة يجب أن يحتوي على row و col صحيحين (تبدأ من 1)'
           });
         }
+
+        // تحويل المواقع: طرح 1 من row و col لجعلها تبدأ من 0
+        word.position.row = word.position.row - 1;
+        word.position.col = word.position.col - 1;
       }
     }
 
