@@ -155,7 +155,7 @@ class WhatsAppService {
 
       // رابط صفحة الجلسات
       const frontendUrl = process.env.FRONTEND_URL || 'http://192.168.0.5:3000';
-      const sessionUrl = `${frontendUrl}/discussions`;
+      const sessionUrl = `${frontendUrl}/polls`;
 
       // نص الرسالة
       const message = `مرحباً ${user.name}! 👋\n\n` +

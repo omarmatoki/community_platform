@@ -2,6 +2,8 @@
 const { Game, UserGame } = require('../models');
 const { addPoints, calculateGamePoints } = require('../utils/pointsSystem');
 const fs = require('fs');
+const sharp = require('sharp');
+const path = require('path');
 
 // @desc    إنشاء لعبة جديدة
 // @route   POST /api/games
@@ -86,9 +88,28 @@ const createGame = async (req, res, next) => {
         });
       }
 
-      // إضافة مسار الصورة إلى المحتوى
-      // req.file.path يحتوي بالفعل على uploads/ لذلك نضيف / فقط في البداية
-      content.imageUrl = `/${req.file.path.replace(/\\/g, '/')}`;
+      // تحويل الصورة إلى WebP
+      try {
+        const originalPath = req.file.path;
+        const fileNameWithoutExt = path.basename(originalPath, path.extname(originalPath));
+        const webpFileName = `${fileNameWithoutExt}.webp`;
+        const webpPath = path.join(path.dirname(originalPath), webpFileName);
+
+        // تحويل الصورة إلى WebP باستخدام sharp
+        await sharp(originalPath)
+          .webp({ quality: 85 }) // جودة 85% توازن بين الحجم والجودة
+          .toFile(webpPath);
+
+        // حذف الصورة الأصلية
+        fs.unlinkSync(originalPath);
+
+        // إضافة مسار الصورة WebP إلى المحتوى
+        content.imageUrl = `/${webpPath.replace(/\\/g, '/')}`;
+      } catch (error) {
+        // في حالة فشل التحويل، استخدم الصورة الأصلية
+        console.error('خطأ في تحويل الصورة إلى WebP:', error);
+        content.imageUrl = `/${req.file.path.replace(/\\/g, '/')}`;
+      }
     }
 
     const game = await Game.create({
