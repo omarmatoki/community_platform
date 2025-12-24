@@ -211,10 +211,82 @@ const verifyOTP = async (req, res, next) => {
   }
 };
 
-// @desc    تسجيل الدخول (بدون OTP)
+// @desc    تسجيل الدخول للمسؤولين فقط (Admin Only)
 // @route   POST /api/auth/login
 // @access  Public
 const login = async (req, res, next) => {
+  try {
+    const { phoneNumber, password } = req.body;
+
+    // التحقق من البيانات المطلوبة
+    if (!phoneNumber || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'رقم الهاتف وكلمة المرور مطلوبان'
+      });
+    }
+
+    // التحقق من وجود المستخدم
+    const user = await User.findOne({ where: { phoneNumber } });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'رقم الهاتف أو كلمة المرور غير صحيحة'
+      });
+    }
+
+    // التحقق من كلمة المرور
+    const isPasswordValid = await user.comparePassword(password);
+    if (!isPasswordValid) {
+      return res.status(401).json({
+        success: false,
+        message: 'رقم الهاتف أو كلمة المرور غير صحيحة'
+      });
+    }
+
+    // التحقق من أن المستخدم هو مسؤول (Admin)
+    if (user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'غير مصرح لك بالدخول. هذا المسار مخصص للمسؤولين فقط'
+      });
+    }
+
+    // التحقق من أن الحساب مفعّل
+    if (!user.isPhoneVerified) {
+      return res.status(403).json({
+        success: false,
+        message: 'يجب تفعيل الحساب أولاً. يرجى التحقق من رمز OTP المرسل'
+      });
+    }
+
+    // إنشاء التوكن
+    const token = generateToken(user.id);
+
+    res.status(200).json({
+      success: true,
+      message: 'مرحباً بك أيها المسؤول! تم تسجيل الدخول بنجاح',
+      data: {
+        user: {
+          id: user.id,
+          name: user.name,
+          phoneNumber: user.phoneNumber,
+          points: user.points,
+          role: user.role,
+          isPhoneVerified: user.isPhoneVerified
+        },
+        token
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    تسجيل الدخول للمستخدمين (بدون فحص الرول)
+// @route   POST /api/auth/login-user
+// @access  Public
+const loginUser = async (req, res, next) => {
   try {
     const { phoneNumber, password } = req.body;
 
@@ -514,6 +586,7 @@ module.exports = {
   register,
   verifyOTP,
   login,
+  loginUser,
   resendOTP,
   getProfile,
   updateProfile,

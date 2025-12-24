@@ -100,14 +100,17 @@ const calculateSessionPoints = (customPoints = null) => {
 };
 
 /**
- * الحصول على لوحة الصدارة
+ * الحصول على لوحة الصدارة (المستخدمين العاديين فقط - بدون المسؤولين)
  * @param {Number} limit - عدد المستخدمين المراد عرضهم
- * @returns {Array} - قائمة بأعلى المستخدمين نقاطاً
+ * @returns {Array} - قائمة بأعلى المستخدمين العاديين نقاطاً (role = 'user')
  */
 const getLeaderboard = async (limit = 10) => {
   try {
     const topUsers = await User.findAll({
       attributes: ['id', 'name', 'phoneNumber', 'points', 'createdAt'],
+      where: {
+        role: 'user'  // فقط المستخدمين العاديين (بدون admin)
+      },
       order: [['points', 'DESC']],
       limit: parseInt(limit)
     });
@@ -126,9 +129,9 @@ const getLeaderboard = async (limit = 10) => {
 };
 
 /**
- * الحصول على ترتيب مستخدم معين في لوحة الصدارة
+ * الحصول على ترتيب مستخدم معين في لوحة الصدارة (بين المستخدمين العاديين فقط)
  * @param {String} userId - معرف المستخدم
- * @returns {Object} - ترتيب المستخدم
+ * @returns {Object} - ترتيب المستخدم بين المستخدمين العاديين
  */
 const getUserRank = async (userId) => {
   try {
@@ -138,9 +141,10 @@ const getUserRank = async (userId) => {
       throw new Error('المستخدم غير موجود');
     }
 
-    // حساب عدد المستخدمين الذين لديهم نقاط أكثر
+    // حساب عدد المستخدمين (العاديين فقط) الذين لديهم نقاط أكثر
     const higherRankedCount = await User.count({
       where: {
+        role: 'user',  // فقط المستخدمين العاديين
         points: {
           [require('sequelize').Op.gt]: user.points
         }

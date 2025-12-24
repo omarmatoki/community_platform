@@ -5,6 +5,7 @@ const {
   register,
   verifyOTP,
   login,
+  loginUser,
   resendOTP,
   getProfile,
   updateProfile,
@@ -25,8 +26,11 @@ router.post('/verify', verifyOTPValidation, verifyOTP);
 
 // ==================== مسارات تسجيل الدخول (Login) ====================
 
-// تسجيل الدخول - بدون OTP
+// تسجيل الدخول للمسؤولين فقط (Admin Only)
 router.post('/login', loginValidation, login);
+
+// تسجيل الدخول للمستخدمين (بدون فحص الرول)
+router.post('/login-user', loginValidation, loginUser);
 
 // ==================== مسارات عامة ====================
 
