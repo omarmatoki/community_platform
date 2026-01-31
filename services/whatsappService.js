@@ -28,13 +28,23 @@ class WhatsAppService {
 
     // في بيئة production على Docker، استخدام Chromium المثبت من النظام إذا كان موجوداً
     if (process.env.NODE_ENV === 'production') {
-      const fs = require('fs');
-      const chromiumPath = '/usr/bin/chromium';
+  const fs = require('fs');
 
-      if (fs.existsSync(chromiumPath)) {
-        puppeteerConfig.executablePath = chromiumPath;
-      }
+  // تحقق من المسار الصحيح لـ Chromium على السيرفر
+  const possiblePaths = [
+    '/usr/bin/chromium-browser',
+    '/usr/bin/chromium',
+    '/usr/bin/google-chrome-stable'
+  ];
+
+  for (const path of possiblePaths) {
+    if (fs.existsSync(path)) {
+      puppeteerConfig.executablePath = path;
+      break;
     }
+  }
+}
+
 
     this.client = new Client({
       authStrategy: new LocalAuth({
