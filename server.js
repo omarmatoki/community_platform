@@ -15,6 +15,7 @@ const surveyRoutes = require('./routes/surveyRoutes');
 const gameRoutes = require('./routes/gameRoutes');
 const pollRoutes = require('./routes/pollRoutes');
 const discussionRoutes = require('./routes/discussionRoutes');
+const whatsappRoutes = require('./routes/whatsappRoutes');
 
 // إنشاء تطبيق Express
 const app = express();
@@ -63,6 +64,7 @@ app.use('/api/surveys', surveyRoutes);
 app.use('/api/games', gameRoutes);
 app.use('/api/polls', pollRoutes);
 app.use('/api/discussions', discussionRoutes);
+app.use('/api/whatsapp', whatsappRoutes);
 
 // معالجة المسارات غير الموجودة
 app.use(notFound);
@@ -84,11 +86,12 @@ const startServer = async () => {
 await sequelize.sync({ force: false, alter: false });
     console.log('✓ تمت مزامنة قاعدة البيانات بنجاح');
 
-    // بدء خدمة WhatsApp
-    console.log('🔄 جاري الاتصال بـ WhatsApp...');
+    // بدء خدمة WhatsApp (غير مانعة للـ server)
+    console.log('🔄 جاري الاتصال بـ WhatsApp (Baileys - بدون Chrome)...');
     whatsappService.connect().catch(error => {
       console.error('⚠️  تحذير: فشل الاتصال بـ WhatsApp:', error.message);
       console.log('💡 يمكنك تشغيل: node initWhatsApp.js لربط WhatsApp يدوياً');
+      console.log('💡 أو استخدم: GET /api/whatsapp/qr (بعد تسجيل الدخول كأدمن) لمسح QR');
     });
 
     // بدء السيرفر

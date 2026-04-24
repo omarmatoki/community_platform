@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  community-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: community-platform-backend
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=production
+      - PORT=4000
+      - DB_HOST=host.docker.internal
+      - DB_USER=${DB_USER:-community_user}
+      - DB_PASSWORD=${DB_PASSWORD:-community_pass123}
+      - DB_NAME=${DB_NAME:-community_platform}
+      - DB_DIALECT=mysql
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRE=7d
+      - FRONTEND_URL=${FRONTEND_URL:-http://161.97.156.42:4001}
+      - WHATSAPP_MESSAGE_DELAY=30000
+    volumes:
+      - ./uploads:/app/uploads
+      - ./auth_info_baileys:/app/auth_info_baileys
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - community-network
+
+networks:
+  community-network:
+    driver: bridge

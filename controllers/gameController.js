@@ -2,8 +2,15 @@
 const { Game, UserGame } = require('../models');
 const { addPoints, calculateGamePoints } = require('../utils/pointsSystem');
 const fs = require('fs');
-const sharp = require('sharp');
 const path = require('path');
+
+// sharp اختياري — يعمل إذا كانت libvips مثبتة، وإلا يُستخدم الملف الأصلي
+let sharp;
+try {
+  sharp = require('sharp');
+} catch {
+  console.warn('⚠️  sharp غير متاح — سيتم حفظ الصور بصيغتها الأصلية بدون تحويل WebP');
+}
 
 // @desc    إنشاء لعبة جديدة
 // @route   POST /api/games
@@ -88,26 +95,26 @@ const createGame = async (req, res, next) => {
         });
       }
 
-      // تحويل الصورة إلى WebP
+      // تحويل الصورة إلى WebP (إذا كانت sharp متاحة)
       try {
         const originalPath = req.file.path;
-        const fileNameWithoutExt = path.basename(originalPath, path.extname(originalPath));
-        const webpFileName = `${fileNameWithoutExt}.webp`;
-        const webpPath = path.join(path.dirname(originalPath), webpFileName);
+        if (sharp) {
+          const fileNameWithoutExt = path.basename(originalPath, path.extname(originalPath));
+          const webpFileName = `${fileNameWithoutExt}.webp`;
+          const webpPath = path.join(path.dirname(originalPath), webpFileName);
 
-        // تحويل الصورة إلى WebP باستخدام sharp
-        await sharp(originalPath)
-          .webp({ quality: 85 }) // جودة 85% توازن بين الحجم والجودة
-          .toFile(webpPath);
+          await sharp(originalPath)
+            .webp({ quality: 85 })
+            .toFile(webpPath);
 
-        // حذف الصورة الأصلية
-        fs.unlinkSync(originalPath);
-
-        // إضافة مسار الصورة WebP إلى المحتوى
-        content.imageUrl = `/${webpPath.replace(/\\/g, '/')}`;
+          fs.unlinkSync(originalPath);
+          content.imageUrl = `/${webpPath.replace(/\\/g, '/')}`;
+        } else {
+          // استخدام الصورة الأصلية بدون تحويل
+          content.imageUrl = `/${originalPath.replace(/\\/g, '/')}`;
+        }
       } catch (error) {
-        // في حالة فشل التحويل، استخدم الصورة الأصلية
-        console.error('خطأ في تحويل الصورة إلى WebP:', error);
+        console.error('خطأ في معالجة الصورة:', error);
         content.imageUrl = `/${req.file.path.replace(/\\/g, '/')}`;
       }
     }
